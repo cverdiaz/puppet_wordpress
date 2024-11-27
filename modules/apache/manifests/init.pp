@@ -32,11 +32,28 @@ class apache {
     notify  => Service['apache2'],
   }
 
+  package { ['php', 'php-mysqli', 'php-curl', 'php-gd', 'php-xml', 'php-mbstring', 'php-zip', 'php-soap', 'libapache2-mod-php']:
+    ensure  => installed,
+    require => Package['apache2'],
+  }
+
   service { 'apache2':
-    ensure => running,
-    enable => true,
+    ensure     => running,
+    enable     => true,
     hasstatus  => true,
-    restart => "/usr/sbin/apachectl configtest && /usr/sbin/service apache2 reload",
+    subscribe  => Package['php'],
+    restart    => '/usr/sbin/apachectl configtest && /usr/sbin/service apache2 restart',  
+  }
+
+  exec { 'check-php-version':
+    command => 'php -v',
+    unless  => 'test -f /usr/bin/php',
+    path    => '/bin:/sbin:/usr/bin:/usr/sbin',
+    notify  => Notify['PHP version'],
+  }
+
+  #Notificar la versión de PHP
+  notify { 'PHP version':
+    message => 'La versión de PHP se ha verificado.',
   }
 }
-

@@ -1,4 +1,5 @@
 $document_root = '/vagrant'
+
 include apache
 
 exec { 'Skip Message':
