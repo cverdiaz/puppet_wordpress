@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "bento/ubuntu-22.04"
+  config.vm.hostname = "puppet-wordpress"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -55,6 +56,7 @@ Vagrant.configure("2") do |config|
   #
   #   # Customize the amount of memory on the VM:
      vb.memory = "1024"
+     vb.cpus = 2  
    end
   #
   # View the documentation for the provider you are using for more
@@ -68,8 +70,13 @@ Vagrant.configure("2") do |config|
 		sudo dpkg -i puppet6-release-bionic.deb
 		sudo apt-get update
 		sudo apt-get install -y puppet-agent
+
+    # Agregar rutas necesarias al PATH
+    echo 'PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin' | sudo tee -a /etc/profile
+    echo 'export PATH' | sudo tee -a /etc/profile
+    source /etc/profile
    SHELL
-   
+
    config.vm.provision "puppet" do |puppet|
     puppet.module_path = "modules"        
     puppet.manifests_path = "manifests"   # Default

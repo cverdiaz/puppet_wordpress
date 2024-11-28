@@ -1,6 +1,7 @@
 $document_root = '/vagrant'
 
 include apache
+include mysql
 
 exec { 'Skip Message':
   command => "echo ‘Este mensaje sólo se muestra si no se ha copiado el fichero index.html'",
