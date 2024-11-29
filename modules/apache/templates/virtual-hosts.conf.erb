@@ -1,11 +1,12 @@
 <VirtualHost *:80>
-  ServerAdmin webmaster@localhost
-  DocumentRoot <%= @document_root %>
+    DocumentRoot /var/www/html
+    ServerName localhost
 
-  <Directory <%= @document_root %>>
-    Require all granted
-  </Directory>
-
-  ErrorLog ${APACHE_LOG_DIR}/error.log
-  CustomLog ${APACHE_LOG_DIR}/access.log combined
+    <Directory /var/www/html>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    # Logs para depuración
+    ErrorLog ${APACHE_LOG_DIR}/wordpress_error.log
+    CustomLog ${APACHE_LOG_DIR}/wordpress_access.log combined
 </VirtualHost>

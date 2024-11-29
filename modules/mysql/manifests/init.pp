@@ -1,5 +1,7 @@
 class mysql {
 
+  $root_password = 'dan007'  # Aquí define la contraseña para root
+
   # Asegurarse de que el sistema esté actualizado
   exec { 'update_package_list':
     command => '/usr/bin/apt-get update -y',
@@ -19,6 +21,14 @@ class mysql {
     require    => Package['mysql-server'],
   }
 
+  # Establecer la contraseña para el usuario root en MySQL
+  exec { 'set_mysql_root_password':
+    command => "/usr/bin/mysqladmin -u root password '${root_password}'",
+    path    => ['/bin', '/usr/bin'],
+    unless  => "/usr/bin/mysql -u root -p${root_password} -e 'SHOW DATABASES;'",
+    require => Service['mysql'],
+  }
+
   # Configuración adicional (opcional)
   exec { 'secure_mysql_installation':
     command => '/usr/bin/mysql_secure_installation --use-default',
@@ -26,4 +36,7 @@ class mysql {
     onlyif  => 'test -f /usr/bin/mysql',
     require => Service['mysql'],
   }
+
+  # Incluir configuración para WordPress
+  include mysql::wordpress_config
 }
