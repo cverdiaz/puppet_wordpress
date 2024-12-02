@@ -21,20 +21,24 @@ class mysql {
     require    => Package['mysql-server'],
   }
 
-  # Establecer la contraseña para el usuario root en MySQL
   exec { 'set_mysql_root_password':
-    command => "/usr/bin/mysqladmin -u root password '${root_password}'",
+    command => "/usr/bin/mysql -e \"ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_password}'; FLUSH PRIVILEGES;\"",
     path    => ['/bin', '/usr/bin'],
-    unless  => "/usr/bin/mysql -u root -p${root_password} -e 'SHOW DATABASES;'",
+    unless  => "/usr/bin/mysql -u root -p ${root_password} -e 'SHOW DATABASES;'",
     require => Service['mysql'],
   }
 
-  # Configuración adicional (opcional)
-  exec { 'secure_mysql_installation':
-    command => '/usr/bin/mysql_secure_installation --use-default',
+  # exec { 'secure_mysql_installation':
+  #   command => '/usr/bin/mysql_secure_installation --use-default',
+  #   path    => ['/bin', '/usr/bin'],
+  #   onlyif  => 'test -f /usr/bin/mysql',
+  #   require => Service['mysql'],
+  # }
+
+  exec { 'restart_mysql':
+    command => '/bin/systemctl restart mysql',
     path    => ['/bin', '/usr/bin'],
-    onlyif  => 'test -f /usr/bin/mysql',
-    require => Service['mysql'],
+    require => Exec['set_mysql_root_password'],
   }
 
   # Incluir configuración para WordPress
